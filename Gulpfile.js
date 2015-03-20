@@ -4,7 +4,9 @@ var gulp = require('gulp'),
     sass = require('gulp-sass'),
     auto_prefixer = require('gulp-autoprefixer'),
     px_to_rem = require('gulp-pxtorem'),
-    size = require('gulp-size');
+    size = require('gulp-size'),
+    watch = require('gulp-watch'),
+    clean = require('gulp-clean');
 
 gulp.task('serve', function(){
     browser_sync({
@@ -15,14 +17,19 @@ gulp.task('serve', function(){
         open: false
     });
 
-    gulp.watch(['./src/assets/scss/**/*.scss'], ['styles']);
-    gulp.watch(['./src/*.swig'], ['templates']);
+    watch('./src/assets/scss/**/*.scss', function(){
+        gulp.run('styles')
+    })
+
+    watch('./src/*.swig', function(){
+        gulp.run('templates')
+    })
+
 });
 
 gulp.task('styles', function(){
     return gulp.src('./src/assets/scss/**/*.scss')
         .pipe(sass({
-            // errLogToConsole stops sass errors breaking the task
             errLogToConsole: true,
             precision: 10,
             sourceComments: true,
@@ -41,7 +48,7 @@ gulp.task('styles', function(){
         }));
 });
 
-gulp.task('templates', function(){
+gulp.task('templates', ['clean'], function(){
     gulp.src('./src/*.swig')
         .pipe(swig({
             defaults: {
@@ -52,6 +59,11 @@ gulp.task('templates', function(){
         .on('end', function(){
             browser_sync.reload()
         })
+});
+
+gulp.task('clean', function(){
+    gulp.src('./dist/*.html')
+        .pipe(clean())
 });
 
 gulp.task('default', ['serve', 'templates', 'styles']);
