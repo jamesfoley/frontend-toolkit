@@ -19,19 +19,19 @@ gulp.task('serve', function(){
     });
 
     watch('./src/assets/scss/**/*.scss', function(){
-        gulp.run('styles')
+        gulp.start('styles')
     })
 
     watch('./src/assets/js/**/*.js', function(){
-        gulp.run('scripts')
+        gulp.start('scripts')
     })
 
     watch('./src/assets/img/**/*', function(){
-        gulp.run('images')
+        gulp.start('images')
     })
 
     watch('./src/*.swig', function(){
-        gulp.run('templates')
+        gulp.start('templates')
     })
 
 });
@@ -64,6 +64,9 @@ gulp.task('templates', ['clean'], function(){
                 cache: false
             }
         }))
+        .on('error', function(error){
+            console.log(error.message)
+        })
         .pipe(gulp.dest('./dist'))
         .on('end', function(){
             browser_sync.reload()
